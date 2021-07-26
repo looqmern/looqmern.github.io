@@ -1,1 +1,1 @@
-# looqmern.github.io
+# delawiz

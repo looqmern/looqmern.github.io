@@ -1,0 +1,463 @@
+<?php
+   function ValidateEmail($email)
+   {
+      $pattern = '/^([0-9a-z]([-.\w]*[0-9a-z])*@(([0-9a-z])+([-\w]*[0-9a-z])*\.)+[a-z]{2,6})$/i';
+      return preg_match($pattern, $email);
+   }
+
+   if($_SERVER['REQUEST_METHOD'] == 'POST')
+   {
+      $mailto = 'info@delawiz.com';
+      $mailfrom = isset($_POST['email']) ? $_POST['email'] : $mailto;
+      $subject = 'Delawiz Studio Enquiry';
+      $message = 'The details';
+      $success_url = '#';
+      $error_url = '#';
+      $error = '';
+      $eol = "\n";
+      $max_filesize = isset($_POST['filesize']) ? $_POST['filesize'] * 1024 : 1024000;
+      $boundary = md5(uniqid(time()));
+
+      $header  = 'From: '.$mailfrom.$eol;
+      $header .= 'Reply-To: '.$mailfrom.$eol;
+      $header .= 'MIME-Version: 1.0'.$eol;
+      $header .= 'Content-Type: multipart/mixed; boundary="'.$boundary.'"'.$eol;
+      $header .= 'X-Mailer: PHP v'.phpversion().$eol;
+      if (!ValidateEmail($mailfrom))
+      {
+         $error .= "The specified email address is invalid!\n<br>";
+      }
+
+      if (!empty($error))
+      {
+         $errorcode = file_get_contents($error_url);
+         $replace = "##error##";
+         $errorcode = str_replace($replace, $error, $errorcode);
+         echo $errorcode;
+         exit;
+      }
+
+      $internalfields = array ("submit", "reset", "send", "captcha_code");
+      $message .= $eol;
+      $message .= "IP Address : ";
+      $message .= $_SERVER['REMOTE_ADDR'];
+      $message .= $eol;
+      foreach ($_POST as $key => $value)
+      {
+         if (!in_array(strtolower($key), $internalfields))
+         {
+            if (!is_array($value))
+            {
+               $message .= ucwords(str_replace("_", " ", $key)) . " : " . $value . $eol;
+            }
+            else
+            {
+               $message .= ucwords(str_replace("_", " ", $key)) . " : " . implode(",", $value) . $eol;
+            }
+         }
+      }
+
+      $body  = 'This is a multi-part message in MIME format.'.$eol.$eol;
+      $body .= '--'.$boundary.$eol;
+      $body .= 'Content-Type: text/plain; charset=ISO-8859-1'.$eol;
+      $body .= 'Content-Transfer-Encoding: 8bit'.$eol;
+      $body .= $eol.stripslashes($message).$eol;
+      if (!empty($_FILES))
+      {
+          foreach ($_FILES as $key => $value)
+          {
+             if ($_FILES[$key]['error'] == 0 && $_FILES[$key]['size'] <= $max_filesize)
+             {
+                $body .= '--'.$boundary.$eol;
+                $body .= 'Content-Type: '.$_FILES[$key]['type'].'; name='.$_FILES[$key]['name'].$eol;
+                $body .= 'Content-Transfer-Encoding: base64'.$eol;
+                $body .= 'Content-Disposition: attachment; filename='.$_FILES[$key]['name'].$eol;
+                $body .= $eol.chunk_split(base64_encode(file_get_contents($_FILES[$key]['tmp_name']))).$eol;
+             }
+         }
+      }
+      $body .= '--'.$boundary.'--'.$eol;
+      mail($mailto, $subject, $body, $header);
+      header('Location: '.$success_url);
+      exit;
+   }
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Language" content="en">
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Delawiz Studio NJ- Contact</title>
+<meta name="generator" content="WYSIWYG Web Builder 8 Trial Version - http://www.wysiwygwebbuilder.com">
+<link rel="shortcut icon" href="delstudio%20logo%20small.png">
+<style type="text/css">
+div#container
+{
+   width: 994px;
+   position: relative;
+   margin-top: 0px;
+   margin-left: auto;
+   margin-right: auto;
+   text-align: left;
+}
+body
+{
+   text-align: center;
+   margin: 0;
+   background-color: #FFFFFF;
+   color: #000000;
+}
+</style>
+<style type="text/css">
+a
+{
+   color: #C8D7EB;
+   text-decoration: underline;
+}
+a:visited
+{
+   color: #C8D7EB;
+}
+a:active
+{
+   color: #C8D7EB;
+}
+a:hover
+{
+   color: #376BAD;
+   text-decoration: underline;
+}
+</style>
+<style type="text/css">
+#NavigationBar1 ul.navbar
+{
+   list-style: none;
+   margin: 0;
+   padding: 0;
+}
+#NavigationBar1 ul.navbar li
+{
+   height: 30px;
+   float: left;
+   margin: 0px 5px 0px 0px;
+   overflow:hidden;
+}
+#NavigationBar1 ul.navbar li a
+{
+   display: block;
+   position: relative;
+}
+#NavigationBar1 ul.navbar li a img
+{
+   position: absolute;
+   z-index: 1;
+   border-width: 0px;
+}
+#NavigationBar1 ul.navbar li span
+{
+   display: block;
+   height: 30px;
+   position: absolute;
+   z-index: 2;
+}
+#NavigationBar1_item0 { width: 46px; }
+#NavigationBar1_img0 { left: -46px; }
+#NavigationBar1_item1 { width: 120px; }
+#NavigationBar1_img1 { left: -120px; }
+#NavigationBar1_item2 { width: 117px; }
+#NavigationBar1_img2 { left: -117px; }
+#NavigationBar1_item3 { width: 62px; }
+#NavigationBar1_img3 { left: -62px; }
+#NavigationBar1_item4 { width: 57px; }
+#NavigationBar1_img4 { left: -57px; }
+#NavigationBar1_item5 { width: 57px; }
+#NavigationBar1_img5 { left: -57px; }
+#Image1
+{
+   border: 0px #000000 solid;
+}
+#wb_Text1 
+{
+   background-color: transparent;
+   border: 0px #000000 none;
+   padding: 0;
+}
+#wb_Text1 div
+{
+   text-align: left;
+}
+#Line1
+{
+   border-width: 0;
+   height: 12px;
+   width: 757px;
+}
+#wb_Form1
+{
+   background-color: transparent;
+   border: 1px #D2B48C solid;
+}
+#wb_Text2 
+{
+   background-color: transparent;
+   border: 0px #000000 none;
+   padding: 0;
+}
+#wb_Text2 div
+{
+   text-align: left;
+}
+#Editbox1
+{
+   border: 1px #C0C0C0 solid;
+   background-color: #FFFFFF;
+   color :#000000;
+   font-family: 'Trebuchet MS';
+   font-size: 13px;
+   text-align: left;
+   vertical-align: middle;
+}
+#wb_Text3 
+{
+   background-color: transparent;
+   border: 0px #000000 none;
+   padding: 0;
+}
+#wb_Text3 div
+{
+   text-align: left;
+}
+#Editbox2
+{
+   border: 1px #C0C0C0 solid;
+   background-color: #FFFFFF;
+   color :#000000;
+   font-family: 'Trebuchet MS';
+   font-size: 13px;
+   text-align: left;
+   vertical-align: middle;
+}
+#wb_Text4 
+{
+   background-color: transparent;
+   border: 0px #000000 none;
+   padding: 0;
+}
+#wb_Text4 div
+{
+   text-align: left;
+}
+#Editbox3
+{
+   border: 1px #C0C0C0 solid;
+   background-color: #FFFFFF;
+   color :#000000;
+   font-family: 'Trebuchet MS';
+   font-size: 13px;
+   text-align: left;
+   vertical-align: middle;
+}
+#wb_Text5 
+{
+   background-color: transparent;
+   border: 0px #000000 none;
+   padding: 0;
+}
+#wb_Text5 div
+{
+   text-align: left;
+}
+#Editbox4
+{
+   border: 1px #C0C0C0 solid;
+   background-color: #FFFFFF;
+   color :#000000;
+   font-family: 'Trebuchet MS';
+   font-size: 13px;
+   text-align: left;
+   vertical-align: middle;
+}
+#wb_Text6 
+{
+   background-color: transparent;
+   border: 0px #000000 none;
+   padding: 0;
+}
+#wb_Text6 div
+{
+   text-align: left;
+}
+#Editbox5
+{
+   border: 1px #C0C0C0 solid;
+   background-color: #FFFFFF;
+   color :#000000;
+   font-family: 'Trebuchet MS';
+   font-size: 13px;
+   text-align: left;
+   vertical-align: middle;
+}
+#wb_Text7 
+{
+   background-color: transparent;
+   border: 0px #000000 none;
+   padding: 0;
+}
+#wb_Text7 div
+{
+   text-align: left;
+}
+#Combobox1
+{
+   border: 1px #C0C0C0 solid;
+   background-color: #FFFFFF;
+   color: #000000;
+   font-family: 'Trebuchet MS';
+   font-size: 13px;
+}
+#wb_Text8 
+{
+   background-color: transparent;
+   border: 0px #000000 none;
+   padding: 0;
+}
+#wb_Text8 div
+{
+   text-align: left;
+}
+#TextArea1
+{
+   border: 1px #C0C0C0 solid;
+   background-color: #FFFFFF;
+   color :#000000;
+   font-family: 'Trebuchet MS';
+   font-size: 13px;
+   text-align: left;
+}
+#Button1
+{
+   border: 1px #000000 dotted;
+   background-color: #FFFFFF;
+   color: #000000;
+   font-family: 'Trebuchet MS';
+   font-size: 13px;
+}
+#wb_Text1 
+{
+   background-color: transparent;
+   border: 0px #000000 none;
+   padding: 0;
+}
+#wb_Text1 div
+{
+   text-align: justify;
+}
+</style>
+<script type="text/javascript" src="./jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function()
+{
+   $("#NavigationBar1 .navbar a").hover(function()
+   {
+      $("img", this).stop().animate({left:"0px"},{queue:false,duration:1000});
+   }, function()
+   {
+      var imgwidth = $("img", this).outerWidth()/2;
+      $("img", this).stop().animate({left:-imgwidth},{queue:false,duration:1000});
+   })
+});
+</script>
+</head>
+<body>
+<div id="container">
+<div id="wb_MasterPage1" style="position:absolute;left:0px;top:0px;width:905px;height:708px;z-index:24;">
+<div id="wb_Shape2" style="position:absolute;left:202px;top:88px;width:679px;height:1px;z-index:0;">
+<img src="images/img0001.gif" id="Shape2" alt="" style="border-width:0;width:679px;height:1px;"></div>
+<div id="NavigationBar1" style="position:absolute;left:368px;top:103px;width:489px;height:30px;z-index:1;">
+<ul class="navbar">
+<li id="NavigationBar1_item0"><a href="./index.html"><img id="NavigationBar1_img0" alt="" src="images/img0002.gif"></a></li>
+<li id="NavigationBar1_item1"><a href="./packages.html"><img id="NavigationBar1_img1" alt="" src="images/img0003.gif"></a></li>
+<li id="NavigationBar1_item2"><a href="./contact.html"><img id="NavigationBar1_img2" alt="" src="images/img0004.gif"></a></li>
+<li id="NavigationBar1_item3"><a href="./schedule.php"><img id="NavigationBar1_img3" alt="" src="images/img0005.gif"></a></li>
+<li id="NavigationBar1_item4"><a href="#"><img id="NavigationBar1_img4" alt="" src="images/img0006.gif"></a></li>
+<li id="NavigationBar1_item5"><a href="./contact.html"><img id="NavigationBar1_img5" alt="" src="images/img0010.gif"></a></li>
+</ul>
+</div>
+<!-- statcounter -->
+<div id="Html3" style="position:absolute;left:149px;top:0px;width:129px;height:11px;z-index:2">
+<!-- Start of StatCounter Code for Default Guide -->
+<script type="text/javascript">
+var sc_project=7957693; 
+var sc_invisible=1; 
+var sc_security="947ea0f6"; 
+</script>
+<script type="text/javascript"
+src="http://www.statcounter.com/counter/counter.js"></script>
+<noscript><div class="statcounter"><a title="tumblr
+analytics" href="http://statcounter.com/tumblr/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/7957693/0/947ea0f6/1/"
+alt="tumblr analytics"></a></div></noscript>
+<!-- End of StatCounter Code for Default Guide --></div>
+<div id="wb_JavaScript1" style="position:absolute;left:708px;top:28px;width:193px;height:21px;z-index:3;">
+<div style="color:#8B0000;font-size:12px;font-family:Comic Sans MS;font-weight:normal;font-style:normal;text-decoration:none" id="basicdate"></div>
+<script type="text/javascript">
+   var now = new Date();
+   var days = new Array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
+   var months = new Array('January','February','March','April','May','June','July','August','September','October','November','December');
+   var date = ((now.getDate() < 10) ? "0" : "") + now.getDate();
+   var year = (now.getYear() < 1000) ? now.getYear() + 1900 : now.getYear();
+   today = days[now.getDay()] + ", " + months[now.getMonth()] + " " + date + ", " + year;
+   var basicdate = document.getElementById('basicdate');
+   basicdate.innerHTML = today;
+</script>
+
+
+</div>
+<div id="wb_Extension1" style="position:absolute;left:390px;top:5px;width:270px;height:77px;z-index:4;">
+</div>
+<div id="wb_Image1" style="position:absolute;left:0px;top:17px;width:282px;height:102px;z-index:5;">
+<img src="images/img0011.png" id="Image1" alt="" border="0" style="width:282px;height:102px;"></div>
+<a href="http://www.wysiwygwebbuilder.com" target="_blank"><img src="images/builtwithwwb8.gif" alt="WYSIWYG Web Builder" style="position:absolute;left:817px;top:641px;width:88px;height:31px;border-width:0;z-index:250"></a>
+<div id="wb_Text1" style="position:absolute;left:108px;top:690px;width:672px;height:18px;z-index:7;">
+<span style="color:#000000;font-family:'Trebuchet MS';font-size:12px;">Copyright© 2012 Delawiz Studios®-A Delawiz Productions company.&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; All Rights Reserved&nbsp;&nbsp;&nbsp; info@delawiz.com</span></div>
+<div id="wb_Line1" style="position:absolute;left:67px;top:674px;width:749px;height:4px;z-index:8;">
+<img src="images/img0013.png" id="Line1" alt=""></div>
+</div>
+<a href="http://www.wysiwygwebbuilder.com" target="_blank"><img src="images/builtwithwwb8.gif" alt="WYSIWYG Web Builder" style="position:absolute;left:818px;top:595px;width:88px;height:31px;border-width:0;z-index:250"></a>
+<div id="wb_Form1" style="position:absolute;left:453px;top:172px;width:295px;height:324px;z-index:26;">
+<form name="contact" method="post" action="<?php echo basename(__FILE__); ?>" enctype="multipart/form-data" id="Form1">
+<input type="hidden" name="city" value="">
+<div id="wb_Text2" style="position:absolute;left:10px;top:15px;width:55px;height:18px;z-index:9;">
+<span style="color:#000000;font-family:'Trebuchet MS';font-size:13px;">Name:</span></div>
+<input type="text" id="Editbox1" style="position:absolute;left:75px;top:15px;width:198px;height:20px;line-height:20px;z-index:10;" name="Name" value="">
+<div id="wb_Text3" style="position:absolute;left:10px;top:42px;width:55px;height:18px;z-index:11;">
+<span style="color:#000000;font-family:'Trebuchet MS';font-size:13px;">City:</span></div>
+<input type="text" id="Editbox2" style="position:absolute;left:75px;top:42px;width:198px;height:20px;line-height:20px;z-index:12;" name="City" value="">
+<div id="wb_Text4" style="position:absolute;left:10px;top:69px;width:55px;height:18px;z-index:13;">
+<span style="color:#000000;font-family:'Trebuchet MS';font-size:13px;">State:</span></div>
+<input type="text" id="Editbox3" style="position:absolute;left:75px;top:69px;width:198px;height:20px;line-height:20px;z-index:14;" name="State" value="">
+<div id="wb_Text5" style="position:absolute;left:10px;top:96px;width:55px;height:18px;z-index:15;">
+<span style="color:#000000;font-family:'Trebuchet MS';font-size:13px;">Phone:</span></div>
+<input type="text" id="Editbox4" style="position:absolute;left:75px;top:96px;width:198px;height:20px;line-height:20px;z-index:16;" name="Phone" value="">
+<div id="wb_Text6" style="position:absolute;left:10px;top:123px;width:55px;height:18px;z-index:17;">
+<span style="color:#000000;font-family:'Trebuchet MS';font-size:13px;">Email:</span></div>
+<input type="text" id="Editbox5" style="position:absolute;left:75px;top:123px;width:198px;height:20px;line-height:20px;z-index:18;" name="Email" value="">
+<div id="wb_Text7" style="position:absolute;left:10px;top:150px;width:55px;height:18px;z-index:19;">
+<span style="color:#000000;font-family:'Trebuchet MS';font-size:13px;">Subject:</span></div>
+<select name="Subject" size="1" id="Combobox1" style="position:absolute;left:75px;top:150px;width:200px;height:24px;z-index:20;">
+<option>General Enquiry</option>
+<option>Packages & Pricing</option>
+<option>Session Details</option>
+</select>
+<div id="wb_Text8" style="position:absolute;left:10px;top:179px;width:55px;height:18px;z-index:21;">
+<span style="color:#000000;font-family:'Trebuchet MS';font-size:13px;">Message</span></div>
+<textarea name="Message" id="TextArea1" style="position:absolute;left:75px;top:179px;width:198px;height:98px;z-index:22;" rows="4" cols="27"></textarea>
+<input type="submit" id="Button1" name="" value="Send" style="position:absolute;left:75px;top:284px;width:60px;height:19px;z-index:23;">
+</form>
+</div>
+<div id="wb_Text1" style="position:absolute;left:227px;top:405px;width:188px;height:94px;text-align:justify;z-index:27;">
+<span style="color:#663300;font-family:'Trebuchet MS';font-size:16px;"><strong><em>CONTACT</em></strong></span><span style="color:#663300;font-family:'Trebuchet MS';font-size:13px;"><br>Delawiz Studio<br>Photographer-</span><span style="color:#000000;font-family:'Trebuchet MS';font-size:13px;"> Lukman<br></span><span style="color:#663300;font-family:'Trebuchet MS';font-size:13px;">Numbers:</span><span style="color:#282828;font-family:'Trebuchet MS';font-size:13px;">5515565903<br></span><span style="color:#663300;font-family:'Trebuchet MS';font-size:13px;">Email:</span><span style="color:#282828;font-family:'Trebuchet MS';font-size:13px;"> info@delawiz.com</span></div>
+</div>
+</body>
+</html>
